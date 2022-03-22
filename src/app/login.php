@@ -1,62 +1,60 @@
-<?php 
-
+<?php
 session_start();
 
 require_once '../config/config.php';
 
 try {
 
-    if( isset($_COOKIE['id']) && isset($_COOKIE['key']) ) {
+    if (isset($_COOKIE['id']) && isset($_COOKIE['key'])) {
         $id = $_COOKIE['id'];
         $key = $_COOKIE['key'];
 
-        $sql = "SELECT username FROM admin WHERE id_admin=:id_admin";
+        $sql = "SELECT username FROM users WHERE id_user=:id_user";
 
         $stmt = $db->prepare($sql);
 
-         // bind parameter ke query
-        $params = [":id_admin" => $id];
+        // bind parameter ke query
+        $params = [":id_user" => $id];
 
         $stmt->execute($params);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if( $key === hash('sha256', $user['username']) ) {
+        if ($key === hash('sha256', $user['username'])) {
             $_SESSION['key'] = true;
         }
     }
 
-    if(isset($_SESSION['key'])) {
+    if (isset($_SESSION['key'])) {
         header("Location: beranda.php");
         exit;
     }
 
-    if(isset($_POST['submit'])){
+    if (isset($_POST['submit'])) {
         $username = $_POST['username'];
         $password = $_POST['password'];
-        
-        $sql = "SELECT * FROM admin WHERE username=:username";
+
+        $sql = "SELECT * FROM users WHERE username=:username";
 
         $stmt = $db->prepare($sql);
-        
+
         // bind parameter ke query
         $params = [":username" => $username];
 
         $stmt->execute($params);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+        
         // jika user terdaftar
-        if($user){
+        if ($user) {
             // verifikasi password
-            if($password === $user["password"]){
+            if ($password === $user["password"]) {
                 $_SESSION["key"] = true;
-                
-                if( isset($_POST['remember']) ) {
-                    setcookie('id', $user['id_admin'], time()+60);
-                    setcookie('key', hash('sha256', $user
-                    ['username']), time()+60);
-			    }
+
+                if (isset($_POST['remember'])) {
+                    setcookie('id', $user['id_user'], time() + 60);
+                    setcookie('key', hash('sha256', $user['username']), time() + 60);
+                }
 
                 // login sukses, alihkan ke halaman timeline
                 header("Location: beranda.php");
@@ -86,7 +84,7 @@ try {
 
     <form action="" method="post">
         <div class="imgcontainer">
-            <img src="img_avatar2.png" alt="Avatar" class="avatar">
+            <img src="../img/login.jpg" alt="Avatar" class="avatar">
         </div>
 
         <div class="container">

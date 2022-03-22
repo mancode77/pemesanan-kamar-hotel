@@ -87,9 +87,9 @@
                                         <div class="input-group mb-3">
                                             ...
                                         </div>
-                                    <div class="modal-footer">
-                                        <button type="button" name="submit" class="btn btn-primary">selengkapnya</button>
-                                    </div>
+                                        <div class="modal-footer">
+                                            <button type="button" name="submit" class="btn btn-primary">selengkapnya</button>
+                                        </div>
                                 </form>
                             </div>
                         </div>

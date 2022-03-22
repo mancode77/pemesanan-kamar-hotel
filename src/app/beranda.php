@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-require_once '../templates/header.php';
-
 if (!isset($_SESSION['key'])) {
     header("Location: login.php");
     exit;
 }
+
+require_once '../templates/header.php';
 ?>
 
 <div class="container mt-3 d-flex justify-content-between">
