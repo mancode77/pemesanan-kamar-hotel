@@ -7,14 +7,12 @@ function tambah_data_kamar_hotel($data)
 
     $id_kamar = htmlspecialchars($data["id_kamar"]);
     $nama_kamar = htmlspecialchars($data["nama_kamar"]);
-    $biaya_sewa = htmlspecialchars($data["biaya_sewa"]);
+    $biaya_sewa = (int) htmlspecialchars($data["biaya_sewa"]);
 
     $sql = "INSERT INTO kamar 
-            (id_kamar, nama_kamar, biaya_kamar)
-			VALUES
-			('$id_kamar', '$nama_kamar', '$biaya_sewa');";
-
-    $stmt = $db->prepare($sql);
+            (id_kamar, nama_kamar, biaya_sewa)
+			VALUES 
+            (:id_kamar, :nama_kamar, :biaya_sewa);";
 
     // bind parameter ke query
     $params = [
@@ -23,11 +21,15 @@ function tambah_data_kamar_hotel($data)
         ":biaya_sewa" => $biaya_sewa
     ];
 
+    $stmt = $db->prepare($sql);
+
     $stmt->execute($params);
 
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$stmt) {
+        return 0;
+    }
 
-    return $result;
+    return 1;
 }
 
 function tambah_data_pelanggan($data)
@@ -36,16 +38,16 @@ function tambah_data_pelanggan($data)
 
     $id_pelanggan = htmlspecialchars($data["id_pelanggan"]);
     $nama_pelanggan = htmlspecialchars($data["nama_pelanggan"]);
-    $jenis_kelamin = htmlspecialchars($data["jenis_kelamin"]);
+    $jenis_kelamin = strtolower(htmlspecialchars($data["jenis_kelamin"]));
     $usia = htmlspecialchars($data["usia"]);
     $alamat = htmlspecialchars($data["alamat"]);
     $pekerjaan = htmlspecialchars($data["pekerjaan"]);
-    $contact_person = htmlspecialchars($data["contact_person"]);
+    $contact_person = (int) htmlspecialchars($data["contact_person"]);
 
     $sql = "INSERT INTO pelanggan 
-            (id_pelanggan_pelanggan, nama_pelanggan, jenis_kelamin, usia, alamat, pekerjaan, contact_person)
+            (id_pelanggan, nama_pelanggan, jenis_kelamin, usia, alamat, pekerjaan, contact_person)
 			VALUES
-			('$nama_pelanggan', '$jenis_kelamin', '$usia', '$alamat', '$pekerjaan', '$contact_person');";
+			(:id_pelanggan, :nama_pelanggan, :jenis_kelamin, :usia, :alamat, :pekerjaan, :contact_person);";
 
     $stmt = $db->prepare($sql);
 
@@ -62,9 +64,11 @@ function tambah_data_pelanggan($data)
 
     $stmt->execute($params);
 
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$stmt) {
+        return 0;
+    }
 
-    return $result;
+    return 1;
 }
 
 function tambah_data_admin($data)
@@ -77,7 +81,7 @@ function tambah_data_admin($data)
     $sql = "INSERT INTO admin 
             (username, status)
 			VALUES
-			('$username', '$status');";
+			(:username, :status);";
 
     $stmt = $db->prepare($sql);
 
@@ -89,61 +93,111 @@ function tambah_data_admin($data)
 
     $stmt->execute($params);
 
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$stmt) {
+        return 0;
+    }
 
-    return $result;
+    return 1;
 }
 
 function tambah_data_sewa_kamar($data)
 {
     global $db;
-
+ 
     $id_transaksi = htmlspecialchars($data["id_transaksi"]);
-    $tanggal_check_in = htmlspecialchars($data["tanggal_check_in"]);
-    $pelanggan = htmlspecialchars($data["pelanggan"]);
-    $nama_kamar = htmlspecialchars($data["nama_kamar"]);
-    $tanggal_check_out = htmlspecialchars($data["tanggal_check_out"]);
+    $id_pelanggan = htmlspecialchars($data["id_pelanggan"]);
+    $id_kamar = htmlspecialchars($data["id_kamar"]);
+    $tanggal_transaksi = htmlspecialchars($data["tanggal_transaksi"]);
+    $tanggal_checkout = htmlspecialchars($data["tanggal_checkout"]);
     $total_biaya_sewa = htmlspecialchars($data["total_biaya_sewa"]);
 
-    $sql = "INSERT INTO admin 
-            (id_transaksi, tanggal_check_in, pelanggan, nama_kamar, tanggal_check_out, total_biaya_sewa)
+    $sql = "INSERT INTO transaksi 
+            (id_transaksi, id_pelanggan, id_kamar, tanggal_transaksi, tanggal_checkout, total_biaya_sewa)
 			VALUES
-			($id_transaksi, '$tanggal_check_in', '$pelanggan', '$nama_kamar', '$tanggal_check_out', '$total_biaya_sewa');";
+			(:id_transaksi, :id_pelanggan, :id_kamar, :tanggal_transaksi, :tanggal_checkout, :total_biaya_sewa);";
 
     $stmt = $db->prepare($sql);
 
     // bind parameter ke query
     $params = [
         ":id_transaksi" => $id_transaksi,
-        ":tanggal_check_in" => $tanggal_check_in,
-        ":pelanggan" => $pelanggan,
-        ":nama_kamar" => $tanggal_check_in,
-        ":tanggal_check_out" => $pelanggan,
-        ":total_biaya_sewa" => $tanggal_check_in
+        ":id_pelanggan" => $id_pelanggan,
+        ":id_kamar" => $id_kamar,
+        ":tanggal_transaksi" => $tanggal_transaksi,
+        ":tanggal_checkout" => $tanggal_checkout,
+        ":total_biaya_sewa" => $total_biaya_sewa
     ];
 
     $stmt->execute($params);
 
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$stmt) {
+        return 0;
+    }
 
-    return $result;
+    return 1;
 }
 
-function tampilkan_data($data, $db, $id_field)
+function tampilkan_data($data, $db_name, $id_field)
 {
     global $db;
 
-    $result_record = htmlspecialchars($data["result_record"]);
+    $result_record = (int) htmlspecialchars($data["result_record"]);
+    $limit = 10;
 
-    $sql = "";
+    $sql = null;
 
-    if ($result_record <= 10) {
-        $sql = "SELECT * FROM $db ORDER BY $id_field DESC LIMIT 0, $result_record";
+    if ($result_record <= $limit) {
+        $offset = 0;
+        $sql = "SELECT * FROM $db_name ORDER BY $id_field ASC LIMIT $offset, $result_record";
+
     } else {
-        $skip = $result_record / 10;
+        if ($result_record > 20) {
+            $result_record -= $limit;
 
-        $sql = "SELECT * FROM $db ORDER BY $id_field DESC LIMIT $skip, $result_record";
+            $sql = "SELECT * FROM $db_name ORDER BY $id_field ASC LIMIT $result_record, $limit";
+        } else {
+            $result_record -= $limit;
+
+            $sql = "SELECT * FROM $db_name ORDER BY $id_field ASC LIMIT $limit, $result_record";
+        }
     }
+
+    $stmt = $db->prepare($sql);
+
+    $stmt->execute();
+
+    $results = [];
+
+    while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+        $results[] = $result;
+    }
+
+    return $results;
+}
+
+function hapus($id, $db_name, $field_name)
+{
+    global $db;
+
+    $id = htmlspecialchars($id);
+
+    $sql = "DELETE FROM $db_name WHERE $field_name = '$id'";
+
+    $stmt = $db->prepare($sql);
+
+    if (!$stmt->execute()) {
+        return 0;
+    }
+
+    return 1;
+}
+
+function ubah($data, $db_name, $field_name,  $id_field)
+{
+    global $db;
+
+    $sql = "SELECT * FROM $db_name LIMIT 0, 1";
 
     $stmt = $db->prepare($sql);
 
@@ -151,54 +205,17 @@ function tampilkan_data($data, $db, $id_field)
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $result;
-}
+    foreach ($result as $key => $value) {
+        $sql = "UPDATE $db_name SET 
+            $key = '$data[$key]' 
+            WHERE $field_name = '$id_field'";
 
-function hapus($id)
-{
-    global $db;
+        $stmt = $db->prepare($sql);
 
-    $id = htmlspecialchars($id);
+        if (!$stmt->execute()) {
+            return 0;
+        }
+    }
 
-    $sql = "DELETE FROM kamar WHERE id_kamar=:id_kamar";
-
-    $stmt = $db->prepare($sql);
-
-    // bind parameter ke query
-    $params = [":id_kamar" => $id];
-
-    $stmt->execute($params);
-
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $result;
-}
-
-function ubah($data)
-{
-    global $db;
-
-    $id_kamar = htmlspecialchars($data['id_kamar']);
-    $nama_kamar = htmlspecialchars($data['nama_kamar']);
-    $biaya_sewa = htmlspecialchars($data['biaya_sewa']);
-
-    $sql = "UPDATE kamar SET
-            id_kamar=:id_kamar,
-            nama_kamar=:nama_kamar, 
-            biaya_sewa=:biaya_sewa";
-
-    $stmt = $db->prepare($sql);
-
-    // bind parameter ke query
-    $params = [
-        ":id_kamar" => $id_kamar,
-        ":nama_kamar" => $nama_kamar,
-        ":biaya_sewa" => $biaya_sewa
-    ];
-
-    $stmt->execute($params);
-
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $result;
+    return 1;
 }

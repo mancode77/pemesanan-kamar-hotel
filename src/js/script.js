@@ -16,6 +16,4 @@ keyword.addEventListener('keyup', function() {
 
     xhr.open('GET', url, true);
     xhr.send();
-
-    console.info('sad')
 });
