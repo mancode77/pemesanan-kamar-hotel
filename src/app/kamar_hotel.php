@@ -1,14 +1,26 @@
 <?php
 session_start();
 
-require_once 'logic.php';
-
 if (!isset($_SESSION['key'])) {
     header("Location: login.php");
     exit;
 }
 
-require_once '../templates/header.php';
+require_once 'logic/logic.php';
+
+$command = null;
+
+switch ($_COOKIE['r']) {
+    case 'admin':
+        require_once '../templates/header-admin/header.php';
+        $command = 'tambah data';
+        break;
+
+    case 'guest':
+        require_once '../templates/header-guest/header.php';
+        $command = 'pesan';
+        break;
+}
 
 // cek apakah tombol submit sudah ditekan atau belum
 if (isset($_POST["submit"])) {
@@ -34,8 +46,6 @@ if (isset($_POST['show_entries'])) {
     // cek apakah data berhasil di tambahkan atau tidak
     $result = tampilkan_data($_POST, "kamar", "id_kamar");
 }
-
-require_once '../templates/header.php';
 ?>
 
 <div class="container mt-3 d-flex justify-content-between">
@@ -51,7 +61,7 @@ require_once '../templates/header.php';
     <form action="" method="post">
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            tambah data
+            <?= $command; ?>
         </button>
 
         <!-- Modal -->
@@ -120,6 +130,7 @@ require_once '../templates/header.php';
                         <td>
                             <?= $row["biaya_sewa"]; ?>
                         </td>
+
                         <td>
                             <button type="button" class="btn btn-warning">
                                 <svg style="width: 16px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -138,6 +149,7 @@ require_once '../templates/header.php';
                                 <a href="hapus.php?id=<?= $row["id_kamar"]; ?>&param1=kamar&param2=id_kamar" style="text-decoration: none; color: white;">hapus</a>
                             </button>
                         </td>
+
                     </tr>
                     <?php $i++; ?>
                 <?php endforeach; ?>

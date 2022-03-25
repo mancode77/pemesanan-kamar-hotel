@@ -6,7 +6,7 @@ if (!isset($_SESSION['key'])) {
     exit;
 }
 
-require_once 'logic.php';
+require_once 'logic/logic.php';
 require_once '../config/config.php';
 
 $global_db_name = null;
@@ -47,7 +47,7 @@ function data($db_name, $field_name, $id_field)
 }
 
 if (isset($_GET['id'])) {
-    $record = data($_GET['param1'], $_GET['param2'], $_GET['id'], );
+    $record = data($_GET['param1'], $_GET['param2'], $_GET['id']);
 }
 
 // cek apakah tombol submit sudah ditekan atau belum
@@ -71,8 +71,22 @@ if (isset($_POST["submit"])) {
     }
 }
 
-require_once '../templates/header.php';
+switch ($_COOKIE['r']) {
+    case 'admin':
+        require_once '../templates/header-admin/header.php';
+        break;
+
+    case 'guest':
+        require_once '../templates/header-guest/header.php';
+        break;
+
+    case 'resepsionis':
+        require_once '../templates/header-resepsionis/header.php';
+        break;
+}
+
 ?>
+
 <div class="container mt-3 d-flex justify-content-center">
     <form action="" method="post">
         <!-- Button trigger modal -->
@@ -81,7 +95,8 @@ require_once '../templates/header.php';
         </button>
 
         <!-- Modal -->
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -90,9 +105,11 @@ require_once '../templates/header.php';
                     </div>
                     <div class="modal-body">
                         <?php foreach ($record as $key => $value) : ?>
-                            <div class="input-group mb-3">
-                                <input type="text" name="<?= $key; ?>" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="<?= str_replace("_", " ", $key); ?>" value="<?= $value; ?>" required>
-                            </div>
+                        <div class="input-group mb-3">
+                            <input type="text" name="<?= $key; ?>" class="form-control"
+                                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"
+                                placeholder="<?= str_replace("_", " ", $key); ?>" value="<?= $value; ?>" required>
+                        </div>
                         <?php endforeach; ?>
                     </div>
                     <div class="modal-footer">

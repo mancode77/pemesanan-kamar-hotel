@@ -6,7 +6,7 @@ if (!isset($_SESSION['key'])) {
 	exit;
 }
 
-require_once 'logic.php';
+require_once 'logic/logic.php';
 
 $id = $_GET["id"];
 $db_name = $_GET['param1'];

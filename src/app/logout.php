@@ -6,6 +6,8 @@ session_destroy();
 
 setcookie('id', '', time() - 3600);
 setcookie('key', '', time() - 3600);
+setcookie('u', '', time() - 3600);
+setcookie('r', '', time() - 3600);
 
 header("Location: login.php");
 exit;

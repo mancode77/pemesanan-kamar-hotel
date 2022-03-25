@@ -1,14 +1,13 @@
 <?php
 session_start();
 
-require_once 'logic.php';
-
 if (!isset($_SESSION['key'])) {
     header("Location: login.php");
     exit;
 }
 
-require_once '../templates/header.php';
+require_once 'logic/logic.php';
+require_once '../templates/header-resepsionis/header.php';
 
 // cek apakah tombol submit sudah ditekan atau belum
 if (isset($_POST["submit"])) {
@@ -34,8 +33,6 @@ if (isset($_POST['show_entries'])) {
     // cek apakah data berhasil di tambahkan atau tidak
     $result = tampilkan_data($_POST, "transaksi", "id_transaksi");
 }
-
-require_once '../templates/header.php';
 ?>
 
 <div class="container mt-3 d-flex justify-content-between">

@@ -19,7 +19,7 @@ try {
         $stmt->execute($params);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+        
         if ($key === hash('sha256', $user['username'])) {
             $_SESSION['key'] = true;
         }
@@ -47,13 +47,15 @@ try {
         
         // jika user terdaftar
         if ($user) {
+            setcookie('u', $user['username'], time() + (60 * 60 * 24 * 7));
+            setcookie('r', $user['role'], time() + (60 * 60 * 24 * 7));
             // verifikasi password
             if ($password === $user["password"]) {
                 $_SESSION["key"] = true;
 
                 if (isset($_POST['remember'])) {
-                    setcookie('id', $user['id_user'], time() + 60);
-                    setcookie('key', hash('sha256', $user['username']), time() + 60);
+                    setcookie('id', $user['id_user'], time() + (60 * 60 * 24 * 7));
+                    setcookie('key', hash('sha256', $user['username']), time() + (60 * 60 * 24 * 7));
                 }
 
                 // login sukses, alihkan ke halaman timeline
@@ -77,6 +79,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="../styles/login_style.css">
+    <link rel="shortcut icon" href="../img/title_hotel.jpg">
 </head>
 
 <body>
@@ -102,7 +105,7 @@ try {
 
         <div class="container" style="background-color:#f1f1f1">
             <button type="button" class="cancelbtn">Cancel</button>
-            <span class="psw">Forgot <a href="#">password?</a></span>
+            <span class="psw">Don't have an account yet? <a href="register.php">Sign Up</a></span>
         </div>
     </form>
 </body>

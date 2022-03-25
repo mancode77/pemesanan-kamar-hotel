@@ -6,8 +6,8 @@ if (!isset($_SESSION['key'])) {
     exit;
 }
 
-require_once '../templates/header.php';
-require_once 'logic.php';
+require_once 'logic/logic.php';
+require_once '../templates/header-resepsionis/header.php';
 
 $result = null;
 
